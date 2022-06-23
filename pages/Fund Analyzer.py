@@ -26,5 +26,13 @@ c = alt.Chart(sectors.sort_values().reset_index()).mark_bar().encode(
 )
 st.altair_chart(c, use_container_width=True)
 
+st.header('Regions')
+c = alt.Chart(regions.sort_values().reset_index()).mark_bar().encode(
+    x='Weight (%)',
+    y=alt.Y('Location', sort='-x'),
+    tooltip=['Location', 'Weight (%)']
+)
+st.altair_chart(c, use_container_width=True)
+
 st.header('Holdings')
 st.dataframe(selected_fund)
