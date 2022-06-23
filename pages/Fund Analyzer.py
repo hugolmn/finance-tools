@@ -21,7 +21,7 @@ col3.metric("Largest region", value=f'{regions.max():.0f}%', delta=regions.idxma
 st.header('Sectors')
 c = alt.Chart(sectors.sort_values().reset_index()).mark_bar().encode(
     x='Weight (%)',
-    y='Sector',
+    y=alt.Y('Sector', sort='-x'),
     tooltip=['Sector', 'Weight (%)']
 )
 st.altair_chart(c, use_container_width=True)
