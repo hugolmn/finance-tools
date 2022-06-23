@@ -8,7 +8,7 @@ df = pd.read_csv('data/fund_compositions.csv')
 
 choice = st.selectbox("Select a fund", df.Fund.unique())
 
-selected_fund = df[df.Fund == choice].copy()
+selected_fund = df[df.Fund == choice].drop(columns=['Fund']).copy()
 sectors = selected_fund.groupby('Sector')['Weight (%)'].sum()
 regions = selected_fund.groupby('Location')['Weight (%)'].sum()
 
