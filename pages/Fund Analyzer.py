@@ -19,7 +19,7 @@ col2.metric("Largest sector", value=f'{sectors.max():.0f}%', delta=sectors.idxma
 col3.metric("Largest region", value=f'{regions.max():.0f}%', delta=regions.idxmax(), delta_color='off')
 
 st.header('Sectors')
-c = alt.Chart(sectors.reset_index()).mark_bar().encode(
+c = alt.Chart(sectors.sort_values().reset_index()).mark_bar().encode(
     x='Weight (%)',
     y='Sector'
 )
