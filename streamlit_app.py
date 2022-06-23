@@ -13,7 +13,7 @@ sectors = selected_fund.groupby('Sector')['Weight (%)'].sum()
 regions = selected_fund.groupby('Location')['Weight (%)'].sum()
 
 col1, col2, col3 = st.columns(3)
-col1.metric("Top 10", f'{selected_fund.iloc[:10]['Weight (%)'].sum():.0f}%')
+col1.metric("Top 10", f"{selected_fund.iloc[:10]['Weight (%)'].sum():.0f}%")
 col2.metric("Largest sector", sectors.idxmax(), f'{sectors.max():.0f}%', delta_color='off')
 col3.metric("Largest region", regions.idxmax(), f'{regions.max():.0f}%', delta_color='off')
 
