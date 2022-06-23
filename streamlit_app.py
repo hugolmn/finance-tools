@@ -1,14 +1,11 @@
-import streamlit
+import streamlit as st
 import pandas as pd
 import requests
 
-streamlit.title("ETF Composition")
+st.title("ETF Composition")
 
-try:
-  response = requests.get('https://www.ishares.com/us/product-screener/product-screener-v3.1.jsn?dcrPath=/templatedata/config/product-screener-v3/data/en/us-ishares/ishares-product-screener-backend-config&siteEntryPassthrough=true').json()
-except:
-  streamlit.error()
-  
-df = pd.DataFrame(response).T
+df = pd.read_csv('data/fund_composition.csv')
 
-streamlit.dataframe(df)
+choice = st.selectbox(df.Fund.unique())
+
+st.dataframe(df)
