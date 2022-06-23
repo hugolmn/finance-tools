@@ -8,4 +8,14 @@ df = pd.read_csv('data/fund_compositions.csv')
 
 choice = st.selectbox("Select a fund", df.Fund.unique())
 
-st.dataframe(df[df.Fund == choice])
+selected_fund = df[df.Fund == choice].copy()
+sectors = selected_fund.groupby('Sector')['Weight (%)'].sum()
+regions = selected_fund.groupby('Location')['Weight (%)'].sum()
+
+col1, col2, col3 = st.columns(3)
+col1.metric("Top 10", selected_fund.iloc[:10]['Weight (%)'].sum())
+col2.metric("Largest sector", sectors.idxmax(), f'{sector.max():.0f}%', delta_color='off')
+col3.metric("Largest region", sectors.regions.idxmax(), f'{sector.max():.0f}%', delta_color='off')
+
+st.header('Holdings')
+st.dataframe(selected_fund)
