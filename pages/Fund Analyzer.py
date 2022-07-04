@@ -32,7 +32,7 @@ c_sectors = alt.Chart(sectors.sort_values().reset_index()).mark_bar().encode(
 chart_sector.altair_chart(c_sectors, use_container_width=True)
 
 chart_asset_classes.header('Asset Classes')
-c_asset_classes = alt.Chart(sectors.sort_values().reset_index()).mark_bar().encode(
+c_asset_classes = alt.Chart(asset_classes.sort_values().reset_index()).mark_bar().encode(
     x='Weight (%)',
     y='Asset Class',
     tooltip=['Asset Class', 'Weight (%)']
