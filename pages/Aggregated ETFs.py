@@ -20,5 +20,5 @@ if clicked:
     portfolio.loc[portfolio.Fund == etf, 'Value'] = portfolio.loc[portfolio.Fund == etf, 'Weight (%)'] * holding / 100
     
   st.header('Holdings')
-  st.dataframe(selected_fund)
+  st.dataframe(portfolio)
     
