@@ -23,6 +23,7 @@ if clicked:
   portfolio = portfolio.groupby(['Ticker', 'Name', 'Sector', 'Asset Class', 'Location'], as_index=False).Value.sum()
   portfolio['Weight (%)'] = portfolio.Value.div(portfolio.Value.sum()) * 100                              
   portfolio['Weight (%)'] = portfolio['Weight (%)'].round(2)
+  portfolio = portfolio.sort_values(by='Value', ascending=False)
   
   sectors = portfolio.groupby('Sector')[['Value', 'Weight (%)']].sum()
   regions = portfolio.groupby('Location')[['Value', 'Weight (%)']].sum()
@@ -71,5 +72,5 @@ if clicked:
   st.altair_chart(c, use_container_width=True)
   
   st.header('Holdings')
-  st.dataframe(portfolio.sort_values(by='Value', ascending=False))
+  st.dataframe(portfolio)
     
