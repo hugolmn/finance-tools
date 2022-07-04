@@ -28,7 +28,7 @@ if clicked:
   asset_classes = portfolio.groupby('Asset Class')['Weight (%)'].sum()
 
   col1, col2, col3 = st.columns(3)
-  col1.metric("Top 10 concentration", value=f"{selected_fund.iloc[:10]['Weight (%)'].sum():.0f}%")
+  col1.metric("Top 10 concentration", value=f"{portfolio.iloc[:10]['Weight (%)'].sum():.0f}%")
   col2.metric("Largest sector", value=f'{sectors.max():.0f}%', delta=sectors.idxmax(), delta_color='off')
   col3.metric("Largest region", value=f'{regions.max():.0f}%', delta=regions.idxmax(), delta_color='off')
 
