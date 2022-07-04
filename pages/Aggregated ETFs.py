@@ -11,4 +11,9 @@ choices = st.multiselect("Select a fund", df.Fund.unique())
 
 holdings = [st.number_input(f'Total value of {choice} holding', min_value=0, step=10) for choice in choices]
   
+clicked = st.button('Show results')
 
+if clicked:
+  for etf, holding in zip(choices; holdings):
+    st.text(f'{etf}: {holding}€')
+    
