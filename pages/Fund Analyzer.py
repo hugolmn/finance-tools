@@ -34,7 +34,7 @@ chart_sector.altair_chart(c_sectors, use_container_width=True)
 chart_asset_classes.header('Asset Classes')
 c_asset_classes = alt.Chart(sectors.sort_values().reset_index()).mark_bar().encode(
     x='Weight (%)',
-    y=alt.Y('Asset Class', sort='-x'),
+    y='Asset Class',
     tooltip=['Asset Class', 'Weight (%)']
 )
 chart_asset_classes.altair_chart(c_asset_classes, use_container_width=True)
@@ -46,7 +46,6 @@ c = alt.Chart(regions.sort_values().reset_index()).mark_bar().encode(
     tooltip=['Location', 'Weight (%)']
 )
 st.altair_chart(c, use_container_width=True)
-
 
 st.header('Holdings')
 st.dataframe(selected_fund)
