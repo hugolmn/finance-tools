@@ -5,17 +5,19 @@ import altair as alt
 
 st.title("Aggregate portfolio of ETFs")
 
-df = pd.read_csv('data/blackrock_fr.csv')
-
-choices = st.multiselect("Select a fund", df.Fund.unique())
-
-holdings = [st.number_input(f'Total value of {choice} holding', min_value=0, step=10) for choice in choices]
+etfs = pd.read_csv('data/blackrock_fr.csv')
+etf_choices = st.multiselect("Select a fund", etfs.Fund.unique())
+etf_holdings = [st.number_input(f'Total value of {choice} holding', min_value=0, step=10) for choice in etf_choices]
   
+stocks = pd.read_csv('data/individual_positions.csv')
+stock_choices = st.multiselect("Select a stock", stocks.Fund.unique())
+stock_holdings = [st.number_input(f'Total value of {choice} holding', min_value=0, step=10) for choice in stock_choices]
+
 clicked = st.button('Show results')
 
 if clicked:
-  portfolio = df[df.Fund.isin(choices)].copy()
-  for etf, holding in zip(choices, holdings):
+  portfolio = etfs[etfs.Fund.isin(etf_choices)].copy()
+  for etf, holding in zip(etf_choices, etf_holdings):
     st.text(f'{etf}: {holding}€')
     portfolio.loc[portfolio.Fund == etf, 'Value'] = portfolio.loc[portfolio.Fund == etf, 'Weight (%)'] * holding / 100
     
