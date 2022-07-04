@@ -23,6 +23,12 @@ if clicked:
     st.text(f'{etf}: {holding}€')
     portfolio.loc[portfolio.Fund == etf, 'Value'] = portfolio.loc[portfolio.Fund == etf, 'Weight (%)'] * holding / 100
     
+  stock_portfolio = stocks[stocks.Name.isin(stock_choices)]
+  for stock, holding in zip(stock_choices, stock_holdings):
+    st.text(f'{stock}: {holding}€')
+    stock_portfolio.loc[stock_portfolio.Name == stock, 'Value'] = holding
+  
+  portfolio = pd.concat([portfolio, stock_portfolio])
   portfolio = portfolio.drop(columns=['Fund'])
   portfolio = portfolio.groupby(['Ticker', 'Name', 'Sector', 'Asset Class', 'Location'], as_index=False).Value.sum()
   portfolio['Weight (%)'] = portfolio.Value.div(portfolio.Value.sum()) * 100                              
