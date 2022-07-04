@@ -14,6 +14,6 @@ holdings = [st.number_input(f'Total value of {choice} holding', min_value=0, ste
 clicked = st.button('Show results')
 
 if clicked:
-  for etf, holding in zip(choices; holdings):
+  for etf, holding in zip(choices, holdings):
     st.text(f'{etf}: {holding}€')
     
