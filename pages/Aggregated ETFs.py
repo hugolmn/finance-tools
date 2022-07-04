@@ -20,7 +20,7 @@ if clicked:
     portfolio.loc[portfolio.Fund == etf, 'Value'] = portfolio.loc[portfolio.Fund == etf, 'Weight (%)'] * holding / 100
     
   portfolio = portfolio.drop(columns=['Fund'])
-  portfolio = portfolio.groupby(['Ticker', 'Name', 'Sector', 'Asset Class', 'Location']).Value.sum()
+  portfolio = portfolio.groupby(['Ticker', 'Name', 'Sector', 'Asset Class', 'Location'], as_index=False).Value.sum()
   portfolio['Weight (%)'] = portfolio.Value.div(portfolio.Value.sum()) * 100                              
                               
   st.header('Holdings')
