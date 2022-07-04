@@ -30,8 +30,8 @@ if clicked:
 
   col1, col2, col3 = st.columns(3)
   col1.metric("Top 10 concentration", value=f"{portfolio.iloc[:10]['Weight (%)'].sum():.0f}%")
-  col2.metric("Largest sector", value=f'{sectors.max():.0f}%', delta=sectors.idxmax(), delta_color='off')
-  col3.metric("Largest region", value=f'{regions.max():.0f}%', delta=regions.idxmax(), delta_color='off')
+  col2.metric("Largest sector", value=f'{sectors['Weight (%)'].max():.0f}%', delta=sectors['Weight (%)'].idxmax(), delta_color='off')
+  col3.metric("Largest region", value=f'{regions['Weight (%)'].max():.0f}%', delta=regions['Weight (%)'].idxmax(), delta_color='off')
 
   st.header('Sectors')
   c_sectors = alt.Chart(sectors.sort_values().reset_index()).mark_bar().encode(
