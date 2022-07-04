@@ -3,6 +3,8 @@ import pandas as pd
 import requests
 import altair as alt
 
+st.set_page_config(layout="wide")
+
 st.title("Aggregate portfolio of ETFs")
 
 etfs = pd.read_csv('data/blackrock_fr.csv')
