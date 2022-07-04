@@ -37,7 +37,7 @@ if clicked:
   c_sectors = alt.Chart(sectors.sort_values().reset_index()).mark_bar().encode(
       x='Weight (%)',
       y=alt.Y('Sector', sort='-x'),
-      tooltip=['Sector', 'Weight (%)']
+      tooltip=['Sector', 'Weight (%)', 'Value']
   )
   st.altair_chart(c_sectors, use_container_width=True)
 
@@ -45,7 +45,7 @@ if clicked:
   c_asset_classes = alt.Chart(asset_classes.sort_values().reset_index()).mark_bar().encode(
       x='Weight (%)',
       y='Asset Class',
-      tooltip=['Asset Class', 'Weight (%)']
+      tooltip=['Asset Class', 'Weight (%)', 'Value']
   )
   st.altair_chart(c_asset_classes, use_container_width=True)
 
@@ -53,10 +53,10 @@ if clicked:
   c = alt.Chart(regions.sort_values().reset_index()).mark_bar().encode(
       x='Weight (%)',
       y=alt.Y('Location', sort='-x'),
-      tooltip=['Location', 'Weight (%)']
+      tooltip=['Location', 'Weight (%)', 'Value']
   )
   st.altair_chart(c, use_container_width=True)
   
   st.header('Holdings')
-  st.dataframe(portfolio)
+  st.dataframe(portfolio.sort_values(by='Value'))
     
