@@ -71,5 +71,5 @@ if clicked:
   st.altair_chart(c, use_container_width=True)
   
   st.header('Holdings')
-  st.dataframe(portfolio.sort_values(by='Value'))
+  st.dataframe(portfolio.sort_values(by='Value', ascending=False))
     
