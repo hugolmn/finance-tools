@@ -10,7 +10,7 @@ etf_choices = st.multiselect("Select a fund", etfs.Fund.unique())
 etf_holdings = [st.number_input(f'Total value of {choice} holding', min_value=0, step=10) for choice in etf_choices]
   
 stocks = pd.read_csv('data/individual_positions.csv')
-stock_choices = st.multiselect("Select a stock", stocks.Fund.unique())
+stock_choices = st.multiselect("Select a stock", stocks.Name.unique())
 stock_holdings = [st.number_input(f'Total value of {choice} holding', min_value=0, step=10) for choice in stock_choices]
 
 clicked = st.button('Show results')
