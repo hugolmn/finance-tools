@@ -7,5 +7,8 @@ st.title("ETF Composition")
 
 df = pd.read_csv('data/blackrock_fr.csv')
 
-choice = st.multiselect("Select a fund", df.Fund.unique())
+choices = st.multiselect("Select a fund", df.Fund.unique())
+
+for choice in choices:
+  st.number_input(f'Total value of {choice} holding')
 
