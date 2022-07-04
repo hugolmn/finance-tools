@@ -22,7 +22,8 @@ if clicked:
   portfolio = portfolio.drop(columns=['Fund'])
   portfolio = portfolio.groupby(['Ticker', 'Name', 'Sector', 'Asset Class', 'Location'], as_index=False).Value.sum()
   portfolio['Weight (%)'] = portfolio.Value.div(portfolio.Value.sum()) * 100                              
-                              
+  portfolio['Weight (%)'] = portfolio['Weight (%)'].round(2)
+  
   sectors = portfolio.groupby('Sector')['Weight (%)'].sum()
   regions = portfolio.groupby('Location')['Weight (%)'].sum()
   asset_classes = portfolio.groupby('Asset Class')['Weight (%)'].sum()
