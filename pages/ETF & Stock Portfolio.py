@@ -5,7 +5,7 @@ import altair as alt
 
 st.set_page_config(layout="wide")
 
-st.title("Aggregate portfolio of ETFs")
+st.title("Aggregate portfolio of ETFs and stocks")
 
 etfs = pd.read_csv('data/blackrock_fr.csv')
 etf_choices = st.multiselect("Select a fund", etfs.Fund.unique())
