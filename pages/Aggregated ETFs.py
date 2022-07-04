@@ -24,9 +24,9 @@ if clicked:
   portfolio['Weight (%)'] = portfolio.Value.div(portfolio.Value.sum()) * 100                              
   portfolio['Weight (%)'] = portfolio['Weight (%)'].round(2)
   
-  sectors = portfolio.groupby('Sector')['Weight (%)'].sum()
-  regions = portfolio.groupby('Location')['Weight (%)'].sum()
-  asset_classes = portfolio.groupby('Asset Class')['Weight (%)'].sum()
+  sectors = portfolio.groupby('Sector')[['Value', 'Weight (%)']].sum()
+  regions = portfolio.groupby('Location')[['Value', 'Weight (%)']].sum()
+  asset_classes = portfolio.groupby('Asset Class')[['Value', 'Weight (%)']].sum()
 
   col1, col2, col3 = st.columns(3)
   col1.metric("Top 10 concentration", value=f"{portfolio.iloc[:10]['Weight (%)'].sum():.0f}%")
