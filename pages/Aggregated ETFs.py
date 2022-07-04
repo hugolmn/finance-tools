@@ -9,6 +9,6 @@ df = pd.read_csv('data/blackrock_fr.csv')
 
 choices = st.multiselect("Select a fund", df.Fund.unique())
 
-for choice in choices:
-  st.number_input(f'Total value of {choice} holding')
+[st.number_input(f'Total value of {choice} holding', min_value=0, step=10) for choice in choices]
+  
 
