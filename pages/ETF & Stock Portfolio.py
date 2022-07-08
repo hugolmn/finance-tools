@@ -21,10 +21,15 @@ previous_etfs = cookie_manager.get(cookie='etf_holdings')
 
 if previous_etfs:
   etf_choices = st.multiselect("Select a fund", etfs.Fund.unique(), default=previous_etfs.keys())
-  etf_holdings = {choice: st.number_input(f'Total value of {choice} holding', min_value=0, step=10, value=previous_etfs[choice]) for choice in etf_choices}
 else:
   etf_choices = st.multiselect("Select a fund", etfs.Fund.unique())
-  etf_holdings = {choice: st.number_input(f'Total value of {choice} holding', min_value=0, step=10) for choice in etf_choices}
+
+etf_holdings = {}
+for etf in etf_choices:
+  if etf in previous_etfs:
+    etf_holdings[etf] = st.number_input(f'Total value of {etf} holding', min_value=0, step=10, value=previous_etfs[etf])
+  else:
+    etf_holdings[etf] = st.number_input(f'Total value of {etf} holding', min_value=0, step=10)
 
 # Stocks
 stocks = pd.read_csv('data/individual_positions.csv')
@@ -32,10 +37,15 @@ previous_stocks = cookie_manager.get(cookie='stock_holdings')
 
 if previous_stocks:
   stock_choices = st.multiselect("Select a stock", stocks.Name.unique(), default=previous_stocks.keys())
-  stock_holdings = {choice: st.number_input(f'Total value of {choice} holding', min_value=0, step=10, value=previous_stocks[choice]) for choice in stock_choices}
 else:
   stock_choices = st.multiselect("Select a stock", stocks.Name.unique())
-  stock_holdings = {choice: st.number_input(f'Total value of {choice} holding', min_value=0, step=10) for choice in stock_choices}
+
+stock_holdings = {}
+for stock in stock_choices:
+  if stock in previous_stocks:
+    stock_holdings[stock] = st.number_input(f'Total value of {stock} holding', min_value=0, step=10, value=previous_stocks[stock])
+  else:
+    stock_holdings[stock] = st.number_input(f'Total value of {stock} holding', min_value=0, step=10)
 
 clicked = st.button('Show results')
 saved = st.button('Save holdings')
