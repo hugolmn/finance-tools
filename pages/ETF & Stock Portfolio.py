@@ -10,8 +10,8 @@ def get_manager():
     return stx.CookieManager()
 
 cookie_manager = get_manager()
-cookies = cookie_manager.get_all()
-st.write(cookies)
+# cookies = cookie_manager.get_all()
+# st.write(cookies)
 
 st.title("Aggregate portfolio of ETFs and stocks")
 
