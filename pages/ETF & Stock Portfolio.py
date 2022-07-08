@@ -1,30 +1,55 @@
 import streamlit as st
 import pandas as pd
-import requests
+import extra_streamlit_components as stx
 import altair as alt
 
 st.set_page_config(layout="wide")
 
+@st.cache(allow_output_mutation=True)
+def get_manager():
+    return stx.CookieManager()
+
+cookie_manager = get_manager()
+cookies = cookie_manager.get_all()
+st.write(cookies)
+
 st.title("Aggregate portfolio of ETFs and stocks")
 
+# ETFs
 etfs = pd.read_csv('data/blackrock_fr.csv')
-etf_choices = st.multiselect("Select a fund", etfs.Fund.unique())
-etf_holdings = [st.number_input(f'Total value of {choice} holding', min_value=0, step=10) for choice in etf_choices]
-  
+previous_etfs = cookie_manager.get(cookie='etf_holdings')
+
+if previous_etfs:
+  etf_choices = st.multiselect("Select a fund", etfs.Fund.unique(), default=previous_etfs.keys())
+  etf_holdings = {choice: st.number_input(f'Total value of {choice} holding', min_value=0, step=10, value=previous_etfs[choice]) for choice in etf_choices}
+else:
+  etf_choices = st.multiselect("Select a fund", etfs.Fund.unique())
+  etf_holdings = {choice: st.number_input(f'Total value of {choice} holding', min_value=0, step=10) for choice in etf_choices}
+
+# Stocks
 stocks = pd.read_csv('data/individual_positions.csv')
-stock_choices = st.multiselect("Select a stock", stocks.Name.unique())
-stock_holdings = [st.number_input(f'Total value of {choice} holding', min_value=0, step=10) for choice in stock_choices]
+previous_stocks = cookie_manager.get(cookie='stock_holdings')
+
+if previous_stocks:
+  stock_choices = st.multiselect("Select a stock", stocks.Name.unique(), default=previous_stocks.keys())
+  stock_holdings = {choice: st.number_input(f'Total value of {choice} holding', min_value=0, step=10, value=previous_stocks[choice]) for choice in stock_choices}
+else:
+  stock_choices = st.multiselect("Select a stock", stocks.Name.unique())
+  stock_holdings = {choice: st.number_input(f'Total value of {choice} holding', min_value=0, step=10) for choice in stock_choices}
 
 clicked = st.button('Show results')
+saved = st.button('Save holdings')
 
 if clicked:
   portfolio = etfs[etfs.Fund.isin(etf_choices)].copy()
-  for etf, holding in zip(etf_choices, etf_holdings):
+  # for etf, holding in zip(etf_choices, etf_holdings):
+  for etf, holding in etf_holdings.items():
     st.text(f'{etf}: {holding}€')
     portfolio.loc[portfolio.Fund == etf, 'Value'] = portfolio.loc[portfolio.Fund == etf, 'Weight (%)'] * holding / 100
     
   stock_portfolio = stocks[stocks.Name.isin(stock_choices)]
-  for stock, holding in zip(stock_choices, stock_holdings):
+  # for stock, holding in zip(stock_choices, stock_holdings):
+  for stock, holding in stock_holdings.items():
     st.text(f'{stock}: {holding}€')
     stock_portfolio.loc[stock_portfolio.Name == stock, 'Value'] = holding
   
@@ -83,4 +108,8 @@ if clicked:
   
   st.header('Holdings')
   st.dataframe(portfolio)
+
+if saved:
+  cookie_manager.set('etf_holdings', etf_holdings, key='etf_hokdings')
+  cookie_manager.set('stock_holdings', stock_holdings, key='stock_holdings')
     
