@@ -11,7 +11,7 @@ def get_manager():
 
 cookie_manager = get_manager()
 cookies = cookie_manager.get_all()
-st.write(cookies)
+# st.write(cookies)
 
 st.title("Aggregate portfolio of ETFs and stocks")
 
@@ -26,7 +26,7 @@ else:
 
 etf_holdings = {}
 for etf in etf_choices:
-  if etf in previous_etfs:
+  if previous_etfs and etf in previous_etfs:
     etf_holdings[etf] = st.number_input(f'Total value of {etf} holding', min_value=0, step=10, value=previous_etfs[etf])
   else:
     etf_holdings[etf] = st.number_input(f'Total value of {etf} holding', min_value=0, step=10)
@@ -42,7 +42,7 @@ else:
 
 stock_holdings = {}
 for stock in stock_choices:
-  if stock in previous_stocks:
+  if previous_stocks and stock in previous_stocks:
     stock_holdings[stock] = st.number_input(f'Total value of {stock} holding', min_value=0, step=10, value=previous_stocks[stock])
   else:
     stock_holdings[stock] = st.number_input(f'Total value of {stock} holding', min_value=0, step=10)
