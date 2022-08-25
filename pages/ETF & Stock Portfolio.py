@@ -12,7 +12,8 @@ def get_manager():
 
 cookie_manager = get_manager()
 cookies = cookie_manager.get_all()
-existing_portfolios = cookie_manager.get(cookie='portfolios')
+if not (existing_portfolios := cookie_manager.get(cookie='portfolios')):
+  existing_portfolios = {}
 
 st.title("Aggregate portfolio of ETFs and stocks")
 
