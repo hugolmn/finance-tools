@@ -95,12 +95,12 @@ if clicked:
   try:
     etf_holdings = etfs[etfs.Fund.isin(etf_choices)].copy()
     for etf, holding in portfolio['etf_holdings'].items():
-      st.text(f'{etf}: {holding}€')
+      # st.text(f'{etf}: {holding}€')
       etf_holdings.loc[etf_holdings.Fund == etf, 'Value'] = etf_holdings.loc[etf_holdings.Fund == etf, 'Weight (%)'] * holding / 100
       
     stock_holdings = stocks[stocks.Name.isin(stock_choices)].copy()
     for stock, holding in portfolio['stock_holdings'].items():
-      st.text(f'{stock}: {holding}€')
+      # st.text(f'{stock}: {holding}€')
       stock_holdings.loc[stock_holdings.Name == stock, 'Value'] = holding
     
     holdings = pd.concat([etf_holdings, stock_holdings])
