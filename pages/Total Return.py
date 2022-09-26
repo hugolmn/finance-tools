@@ -58,15 +58,20 @@ if ticker:
         x='Date:T',
         y=alt.Y(
             'return_percentage:Q',
+            title='Return',
             axis=alt.Axis(format='%'),
         ),
         color=alt.Color(
             'return_type:N',
+            title='',
             scale=alt.Scale(
                 range=[
                     st.secrets["theme"]['primaryColor'],
                     st.secrets["theme"]['secondaryColor']
                 ]
+            ),
+            legend=alt.Legend(
+                orient='top-left',
             )
         ),
         tooltip=[
