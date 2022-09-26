@@ -8,7 +8,7 @@ load_css()
 st.title('Total return calculator')
 col1, col2 = st.columns(2)
 ticker = col1.text_input("Ticker", value='MSFT')
-period = col2.selectbox("Periodd", options=['1mo', '3mo', '6mo', 'ytd', '1y', '2y', '3y', '5y', '10y', '15y', '20y', '30y', 'max'], index=0)
+period = col2.selectbox("Periodd", options=['1mo', '3mo', '6mo', 'ytd', '1y', '2y', '5y', '10y', 'max'], index=0)
 
 if ticker:
     ticker = yf.Ticker(ticker)
