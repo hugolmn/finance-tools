@@ -18,7 +18,7 @@ if ticker:
     history['TotalReturn'] = history['Adj Close'] / history['Adj Close'].iloc[0] - 1
     history = history.reset_index()
 
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
     col1.metric(
         label=f"{period} price return",
         value=f"{history.iloc[-1].PriceReturn:+.0%}"
@@ -26,6 +26,10 @@ if ticker:
     col2.metric(
         label=f"{period} total return",
         value=f"{history.iloc[-1].TotalReturn:+.0%}"
+    )
+    col3.metric(
+        label='Share count',
+        value=f"{history.CumulativeShares.iloc[-1] - 1:+.0%}"
     )
 
     history = pd.melt(
