@@ -2,6 +2,7 @@ import streamlit as st
 import yfinance as yf
 import altair as alt
 import pandas as pd
+import datetime
 from utils import load_css
 load_css()
 
@@ -18,16 +19,24 @@ if ticker:
     history['TotalReturn'] = history['Adj Close'] / history['Adj Close'].iloc[0] - 1
     history = history.reset_index()
 
-    col1, col2, col3 = st.columns(3)
+    n_years = (history.iloc[-1].Date - history.iloc[0].Date) / datetime.timedelta(365.2425)
+
+
+    col1, col2, col3, col4 = st.columns(4)
     col1.metric(
         label=f"{period} price return",
-        value=f"{history.iloc[-1].PriceReturn:+.0%}"
+        value=f"{history.iloc[-1].PriceReturn:+,.0%}"
     )
     col2.metric(
         label=f"{period} total return",
-        value=f"{history.iloc[-1].TotalReturn:+.0%}"
+        value=f"{history.iloc[-1].TotalReturn:+,.0%}"
     )
+    annualized_return = (1 + history.iloc[-1].TotalReturn) ** (1 / n_years) - 1
     col3.metric(
+        label='Annulized total return',
+        value=f"{annualized_return:.1%}"
+    )
+    col4.metric(
         label='Share count',
         value=f"{history.CumulativeShares.iloc[-1] - 1:+.0%}"
     )
