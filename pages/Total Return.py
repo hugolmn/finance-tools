@@ -22,6 +22,8 @@ if ticker:
     history['CumulativeShares'] = ((history.Dividends / history.Close) + 1).cumprod()
     history['PriceReturn'] = history['Close'] / history['Close'].iloc[0] - 1
     history['TotalReturn'] = history['Adj Close'] / history['Adj Close'].iloc[0] - 1
+    history['PriceDrawdown'] = history['Close'] / history['Close'].cummax() - 1
+    history['TotalDrawdown'] = history['Adj Close'] / history['Adj Close'].cummax() - 1
     history = history.reset_index()
 
     n_years = (history.iloc[-1].Date - history.iloc[0].Date) / datetime.timedelta(365.2425)
@@ -46,7 +48,7 @@ if ticker:
         value=f"{history.CumulativeShares.iloc[-1] - 1:+.0%}"
     )
 
-    history = pd.melt(
+    returns = pd.melt(
         history,
         id_vars=['Date'],
         value_vars=['PriceReturn', 'TotalReturn'],
@@ -54,7 +56,7 @@ if ticker:
         value_name='return_percentage'
     )
 
-    chart = alt.Chart(history).mark_line().encode(
+    chart = alt.Chart(returns).mark_line().encode(
         x='Date:T',
         y=alt.Y(
             'return_percentage:Q',
@@ -71,12 +73,46 @@ if ticker:
                 ]
             ),
             legend=alt.Legend(
-                orient='top-left',
+                orient='top',
             )
         ),
         tooltip=[
             alt.Tooltip('Date:T'),
             alt.Tooltip('return_percentage', title='Return', format='0,.0%'),
+            alt.Tooltip('return_type', title='Type')
+        ]
+    ).interactive(bind_y=False)
+    st.altair_chart(chart, use_container_width=True)
+
+    drawdown = pd.melt(
+        history,
+        id_vars=['Date'],
+        value_vars=['PriceDrawdown', 'TotalDrawdown'],
+        var_name='return_type',
+        value_name='return_percentage'
+    )
+
+    chart = alt.Chart(drawdown).mark_line().encode(
+        x='Date:T',
+        y=alt.Y(
+            'return_percentage:Q',
+            title='Return',
+            axis=alt.Axis(format='%'),
+        ),
+        color=alt.Color(
+            'return_type:N',
+            title='',
+            scale=alt.Scale(
+                range=[
+                    st.secrets["theme"]['primaryColor'],
+                    st.secrets["theme"]['secondaryColor']
+                ]
+            ),
+            legend=None
+        ),
+        tooltip=[
+            alt.Tooltip('Date:T'),
+            alt.Tooltip('return_percentage', title='Drawdown', format='0,.0%'),
             alt.Tooltip('return_type', title='Type')
         ]
     ).interactive(bind_y=False)
