@@ -65,7 +65,7 @@ if ticker:
         ),
         color=alt.Color(
             'return_type:N',
-            title='',
+            title='Return Type:',
             scale=alt.Scale(
                 range=[
                     st.secrets["theme"]['primaryColor'],
@@ -96,7 +96,7 @@ if ticker:
         x='Date:T',
         y=alt.Y(
             'return_percentage:Q',
-            title='Return',
+            title='Return', 
             axis=alt.Axis(format='%'),
         ),
         color=alt.Color(
