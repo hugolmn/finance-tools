@@ -19,7 +19,7 @@ period = col2.selectbox("Periodd", options=[
 if ticker:
     ticker = yf.Ticker(ticker)
     history = ticker.history(period=period, auto_adjust=False)
-    st.dataframe(history)
+    # st.dataframe(history)
     dividends = history.loc[history.Dividends > 0, 'Dividends'].to_frame()
 
     # Number of distributions per year
@@ -43,7 +43,7 @@ if ticker:
     # CAGR of dividend
     div_cagr = (1 + dividends.iloc[-1].DivGrowth) ** (1 / n_years) - 1
 
-    st.dataframe(dividends)
+    # st.dataframe(dividends)
 
     col1, col2, col3, col4 = st.columns(4)
     col1.metric(
