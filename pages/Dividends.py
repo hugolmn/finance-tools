@@ -60,7 +60,10 @@ if ticker:
         value=f"{div_cagr:+,.1%}"
     )
 
-    chart = alt.Chart(dividends).mark_line(color=st.secrets["theme"]['primaryColor']).encode(
+    chart = alt.Chart(dividends).mark_line(
+        color=st.secrets["theme"]['primaryColor'],
+        interpolate='step-after'
+    ).encode(
         x=alt.X('Date:T'),
         y=alt.Y(
             'SmoothedYearlyDiv',
