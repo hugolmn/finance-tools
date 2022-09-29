@@ -6,7 +6,7 @@ import datetime
 from utils import load_css
 load_css()
 
-st.title('Total return calculator')
+st.title('Dividends')
 col1, col2 = st.columns(2)
 ticker = col1.text_input("Ticker", value='MSFT')
 period = col2.selectbox("Periodd", options=[
