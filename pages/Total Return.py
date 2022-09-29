@@ -84,6 +84,17 @@ if ticker:
     ).interactive(bind_y=False)
     st.altair_chart(chart, use_container_width=True)
 
+    col1, col2 = st.columns(2)
+    col1.metric(
+        label=f"{period} max drawdown",
+        value=f"{history.TotalDrawdown.min():+,.0%}"
+    )
+    col2.metric(
+        label=f"Current drawdown",
+        value=f"{history.iloc[-1].TotalDrawdown:+,.0%}"
+    )
+    
+
     drawdown = pd.melt(
         history,
         id_vars=['Date'],
