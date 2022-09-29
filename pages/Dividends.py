@@ -60,15 +60,40 @@ if ticker:
         value=f"{div_cagr:+,.1%}"
     )
 
-    chart = alt.Chart(dividends).mark_line(
-        color=st.secrets["theme"]['primaryColor'],
-        interpolate='step-after'
-    ).encode(
-        x=alt.X('Date:T'),
-        y=alt.Y(
-            'SmoothedYearlyDiv',
-            title='TTM dividends',
-            axis=alt.Axis(format='$.2f')
-        )
+    df = pd.merge(
+        left=history.reset_index(),
+        right=dividends.drop(columns=['Dividends']),
+        on='Date',
+        how='left'
+    ).ffill()
+
+    base = alt.Chart(df).mark_line(interpolate='step-after').encode(
+        x=alt.X('Date:T')
     )
+
+    dividend_chart = base.encode(
+        y=alt.Y(
+            'SmoothedYearlyDiv:Q',
+            title='TTM dividends',
+            axis=alt.Axis(format='$.2f'),
+            scale=alt.Scale(zero=False)
+        ),
+        color=alt.value(st.secrets["theme"]['primaryColor'])
+    )
+
+    price_chart = base.encode(
+        y=alt.Y(
+            'Close:Q',
+            title='Stock Price',
+            axis=alt.Axis(format='$.2f'),
+            scale=alt.Scale(zero=False)
+        ),
+        color=alt.value(st.secrets["theme"]['secondaryColor'])
+    )
+
+    chart = alt.layer(dividend_chart, price_chart).resolve_scale(
+        y = 'independent'
+    ).interactive(bind_y=False)
+
     st.altair_chart(chart, use_container_width=True)
+    
