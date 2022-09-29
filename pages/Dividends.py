@@ -19,7 +19,6 @@ period = col2.selectbox("Periodd", options=[
 if ticker:
     ticker = yf.Ticker(ticker)
     history = ticker.history(period=period, auto_adjust=False)
-    # st.dataframe(history)
     dividends = history.loc[history.Dividends > 0, 'Dividends'].to_frame()
 
     # Number of distributions per year
@@ -31,7 +30,7 @@ if ticker:
         .Dividends
         .rolling('365d')
         .apply(lambda x: pd.Series.mode(x)[0])
-        .rolling('360d', min_periods=dist_per_year-1)
+        .rolling('350d', min_periods=dist_per_year-1)
         .sum()
     )
     # Growth in dividends since beginning of timeframe
@@ -42,8 +41,6 @@ if ticker:
     n_years = (dividends.iloc[-1].Date - dividends.iloc[0].Date) / datetime.timedelta(365.2425)
     # CAGR of dividend
     div_cagr = (1 + dividends.iloc[-1].DivGrowth) ** (1 / n_years) - 1
-
-    # st.dataframe(dividends)
 
     col1, col2, col3, col4 = st.columns(4)
     col1.metric(
@@ -62,3 +59,13 @@ if ticker:
         label=f"{period} Dividend CAGR",
         value=f"{div_cagr:+,.1%}"
     )
+
+    chart = alt.Chart(dividends).mark_line(color=st.secrets["theme"]['primaryColor']).encode(
+        x=alt.X('Date:T'),
+        y=alt.Y(
+            'SmoothedYearlyDiv',
+            title='TTM dividends',
+            axis=alt.Axis(format='$.2f')
+        )
+    )
+    st.altair_chart(chart, use_container_width=True)
