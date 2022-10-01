@@ -1,2 +1,2 @@
-extra-streamlit-components
 yfinance
+seaborn
