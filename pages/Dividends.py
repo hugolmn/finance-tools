@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit.runtime.legacy_caching.caching import F
 import yfinance as yf
 import altair as alt
 import pandas as pd
@@ -164,8 +165,16 @@ if ticker:
         return alt.Chart(yield_df.assign(color=col1)).mark_area().encode(
             x='Date:T',
         ).encode(
-            y=alt.Y(f"{col1}:Q", title='Price', axis=alt.Axis(format='$.0f')),
-            y2=alt.Y2(f"{col2}:Q", title='Price'),
+            y=alt.Y(
+                f"{col1}:Q",
+                title='Price',
+                axis=alt.Axis(format='$.0f'),
+                scale=alt.Scale(zero=False)
+            ),
+            y2=alt.Y2(
+                f"{col2}:Q",
+                title='Price'
+            ),
             color=alt.Color(
                 f"color:N",
                 title='Yield Percentile',
