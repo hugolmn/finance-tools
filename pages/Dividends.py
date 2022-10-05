@@ -38,7 +38,7 @@ def process_dividend_history(history):
     dividends['AnnualDividendCount'] = pd.cut(
         dividends.AnnualDividendCount,
         bins=[-np.inf, 0, 1, 2, 3, 4, 8, 12],
-        labels=[0, 1, 2, 3, 4, 4, 12],
+        labels=[0, 1, 2, 4, 4, 4, 12],
         ordered=False,
     ).astype(int)
 
@@ -95,7 +95,10 @@ if ticker:
         right=dividends.drop(columns=['Dividends']),
         on='Date',
         how='left'
-    ).ffill()
+    ).ffill(limit=300).fillna(0)
+
+    index_first_dividend = df[df.YearlyDividends > 0].index[0]
+    df = df.loc[index_first_dividend:]
 
     # Drop where dividends is null
     df = df[df.YearlyDividends.notna()]
@@ -160,27 +163,36 @@ if ticker:
     palette = sns.color_palette("vlag_r", len(quantiles)-1).as_hex()
     scale = alt.Scale(domain=yield_df.columns[1:-1].tolist(), range=palette)
 
+    st.header(f"{ticker} {period} Yield Percentile Chart")
+    st.write(f"Current Yield: {df.iloc[-1].DividendYield:.2%} \
+        (Top {1 - df.DividendYield.rank(pct=True).iloc[-1]:.0%})")
+
     # Create layers for chart
     def make_layer(yield_df, col1, col2):
         return alt.Chart(yield_df.assign(color=col1)).mark_area().encode(
-            x='Date:T',
+            x=alt.X('Date:T', title='', axis=alt.Axis(format='%Y')),
         ).encode(
             y=alt.Y(
                 f"{col1}:Q",
-                title='Price',
+                title='Stock Price',
                 axis=alt.Axis(format='$.0f'),
                 scale=alt.Scale(zero=False)
             ),
             y2=alt.Y2(
                 f"{col2}:Q",
-                title='Price'
+                title='Stock Price'
             ),
             color=alt.Color(
                 f"color:N",
-                title='Yield Percentile',
+                title='Yield',
                 scale=scale,
-                legend=alt.Legend()
-            )
+                legend=alt.Legend(
+                    titleFontSize=15,
+                    labelFontSize=10,
+                    titleLimit=0
+                )
+            ),
+            opacity=alt.value(0.8)
         )
 
     layers=[]
@@ -193,8 +205,19 @@ if ticker:
     )
     layers.append(price)
     
+    chart = alt.layer(
+            *layers
+        ).configure(
+            font='Lato'
+        ).configure_axisY(
+            labelFontSize=15,
+            titleFontSize=10
+        ).configure_axisX(
+            labelAngle=-45,
+            labelFontSize=15
+        )
+
     st.altair_chart(
-        alt.layer(*layers).interactive(bind_y=False),
+        chart.interactive(bind_y=False),
         use_container_width=True
     )
-
