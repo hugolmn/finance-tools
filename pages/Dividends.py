@@ -46,7 +46,9 @@ def process_dividend_history(history):
         .Dividends
         .rolling(5, center=True)
         .median()
-    ).bfill().ffill()
+    )
+    # ).bfill().ffill()
+    dividends['SmoothedDividends'] = dividends.SmoothedDividends.combine_first(dividends.Dividends)
 
     # dividends['YearlyDividends'] = dividends.SmoothedDividends * dividends.AnnualDividendCount
 
