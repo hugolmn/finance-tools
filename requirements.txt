@@ -1,2 +1,4 @@
 yfinance
 seaborn
+altair
+streamlit_extra_components
