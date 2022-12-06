@@ -257,7 +257,7 @@ def generate_dividend_chart(ticker, period):
     # Calculate quantiles of dividend yield
     quantiles = df.DividendYield.quantile(q=np.arange(0, 1.1, .1))
     yield_df = pd.DataFrame(df.YearlyDividends.to_numpy()[:, None] / quantiles.to_numpy(), index=df.Date)
-    yield_df.columns = [f"{decile * 10}%" for decile in yield_df.columns[::-1]]
+    yield_df.columns = [f"{(decile - 1) * 10:<02.0f}% to {decile * 10}%" for decile in yield_df.columns[::-1]]
     yield_df = yield_df.reset_index()
 
     # Create color palette and scale for legend
@@ -296,11 +296,12 @@ def generate_dividend_chart(ticker, period):
                 legend=alt.Legend(
                     # legendX=465,
                     # legendY=-25,
-                    orient='bottom',
-                    direction='horizontal',
+                    orient='top',
+                    direction='vertical',
                 )
             ),
-            opacity=alt.value(0.75)
+            opacity=alt.value(0.75),
+            tooltip=alt.value(None)
         )
 
     layers=[]
@@ -321,7 +322,8 @@ def generate_dividend_chart(ticker, period):
         y=alt.Y(
             'Close:Q',
             scale=alt.Scale(zero=False),
-        )
+        ),
+        tooltip=alt.value(None)
     )
     layers.append(price)
 
@@ -341,7 +343,8 @@ def generate_dividend_chart(ticker, period):
             'DividendYield:Q',
             axis=alt.Axis(format='.1%',),
             scale=alt.Scale(zero=False),
-            title=f'Dividend yield: higher than {df.DividendYield.rank(pct=True).iloc[-1]:.0%} of the period (median {df.DividendYield.quantile(q=0.5):.2%}).'
+            # title=f'Dividend yield: higher than {df.DividendYield.rank(pct=True).iloc[-1]:.0%} of the period (median {df.DividendYield.quantile(q=0.5):.2%}).'
+            title=f'Dividend yield'
         )
     )
     median_yield = price.mark_rule(
@@ -395,7 +398,6 @@ def generate_dividend_chart(ticker, period):
             
     percentile_string = format_percentile(percentile)
 
-    price_chart = alt.layer(*layers)
     price_chart = alt.layer(*layers).properties(
         # width=1200,
         height=500,
