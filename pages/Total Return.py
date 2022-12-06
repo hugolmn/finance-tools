@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import datetime
 from utils import load_css
+st.set_page_config(layout="wide")
 load_css()
 
 def load_ticker_return(ticker, period):
@@ -20,7 +21,7 @@ def load_ticker_return(ticker, period):
 
 st.title('Total return calculator')
 col1, col2, col3 = st.columns(3)
-ticker = col1.text_input("Ticker")
+ticker = col1.text_input("Ticker", value='MSFT')
 period = col2.selectbox("Period", options=[
         '1mo', '3mo', '6mo', 'ytd', '1y', '2y',
         '5y', '10y', '15y', '20y', '25y', 'max'
@@ -55,7 +56,7 @@ if ticker:
         value=f"{annualized_return:.1%}"
     )
     col4.metric(
-        label='Share count',
+        label='Share count if reinvestment',
         value=f"{history.CumulativeShares.iloc[-1] - 1:+.0%}"
     )
 
@@ -73,7 +74,7 @@ if ticker:
     nearest = alt.selection(type='single', nearest=True, on='mouseover',
                             fields=['Date'], empty='none')
 
-    # The basic line
+    # Draw lines
     chart = alt.Chart(returns).mark_line().encode(
         x='Date:T',
         y=alt.Y(
