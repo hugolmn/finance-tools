@@ -1,0 +1,6 @@
+etf/*
+data/*
+etf_csv/*
+etf_xls/*
+.ipynb_checkpoints
+**/.streamlit
