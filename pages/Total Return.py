@@ -76,10 +76,19 @@ if ticker:
 
     # Draw lines
     chart = alt.Chart(returns).mark_line().encode(
-        x='Date:T',
+        x=alt.X(
+            'Date:T',
+            axis=alt.Axis(
+                format='%Y',
+                labels=True,
+                ticks=False,
+                domain=True,
+                tickCount='year'
+            ),
+        ),
         y=alt.Y(
             'return_percentage:Q',
-            title='Return',
+            title='',
             axis=alt.Axis(format='%'),
         ),
         color=alt.Color(
@@ -101,12 +110,9 @@ if ticker:
                 orient='top',
             )
         ),
-        # tooltip=[
-        #     alt.Tooltip('Date:T'),
-        #     alt.Tooltip('return_percentage', title='Return', format='0,.0%'),
-        #     alt.Tooltip('return_type', title='Type')
-        # ],
     )
+
+    chart = chart.properties(height=500)
 
     # Transparent selectors across the chart. This is what tells us
     # the x-value of the cursor
@@ -133,7 +139,7 @@ if ticker:
     # Put the five layers into a chart and bind the data
     st.altair_chart(alt.layer(
             chart, selectors, rules, text
-        ).interactive(bind_y=False),
+        ),
         use_container_width=True
     )
 
@@ -157,7 +163,16 @@ if ticker:
 
     selection = alt.selection_multi(fields=['drawdown_type'], bind='legend')
     chart = alt.Chart(drawdown).mark_line().encode(
-        x='Date:T',
+        x=alt.X(
+            'Date:T',
+            axis=alt.Axis(
+                format='%Y',
+                labels=True,
+                ticks=False,
+                domain=True,
+                tickCount='year'
+            ),
+        ),
         y=alt.Y(
             'drawdown_percentage:Q',
             title='Return', 
@@ -188,5 +203,7 @@ if ticker:
         opacity=alt.condition(selection, alt.value(1), alt.value(0.15))
     ).add_selection(
         selection
-    ).interactive(bind_y=False)
+    )
+    chart = chart.properties(height=400)
+
     st.altair_chart(chart, use_container_width=True)
