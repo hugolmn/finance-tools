@@ -73,7 +73,7 @@ load_css()
 st.title('Dividends')
 col1, col2 = st.columns(2)
 ticker = col1.text_input("Ticker", value='MSFT')
-period = col2.selectbox("Periodd", options=[
+period = col2.selectbox("Period", options=[
         '5y', '10y', '15y', '20y', '25y', '30y', '35y', '40y', 'max'
     ],
     index=2

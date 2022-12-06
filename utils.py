@@ -56,7 +56,7 @@ def streamlit_theme():
     grey_color = "#49494a"
     label_color = "#787878"
     base_size = 16
-    lg_font = base_size * 1.25
+    lg_font = base_size * 1.20
     sm_font = base_size * 0.8
     xl_font = base_size * 2
 
@@ -87,8 +87,13 @@ def streamlit_theme():
                 "orient": "left",
                 # "titleX": -1200,
                 "titleY": -5,
+                "titleX": -35,
                 "titleAngle": 0,
                 "titleAlign": "left",
+                # "position": 10
+                # "offset": 10,
+                # "labelOffset": 10
+                "labelPadding": 5
             },
             "header": {
                 "labelFont": font,
@@ -97,6 +102,7 @@ def streamlit_theme():
                 "titleFontSize": base_size,
             },
             "legend": {
+                "padding": 25,
                 "titleFont": font,
                 "titleColor": label_color,
                 "titleFontSize": base_size,
@@ -114,7 +120,7 @@ def streamlit_theme():
                 "baseline": "middle",
                 "fontWeight": "bold",
                 "fontSize": lg_font,
-                "dx": 7
+                "dx": 3
             }
         }
     }
@@ -257,7 +263,7 @@ def generate_dividend_chart(ticker, period):
     # Calculate quantiles of dividend yield
     quantiles = df.DividendYield.quantile(q=np.arange(0, 1.1, .1))
     yield_df = pd.DataFrame(df.YearlyDividends.to_numpy()[:, None] / quantiles.to_numpy(), index=df.Date)
-    yield_df.columns = [f"{(decile - 1) * 10:<02.0f}% to {decile * 10}%" for decile in yield_df.columns[::-1]]
+    yield_df.columns = [f"{(decile - 1) * 10:>02.0f}% to {decile * 10}%" for decile in yield_df.columns[::-1]]
     yield_df = yield_df.reset_index()
 
     # Create color palette and scale for legend
@@ -399,15 +405,12 @@ def generate_dividend_chart(ticker, period):
     percentile_string = format_percentile(percentile)
 
     price_chart = alt.layer(*layers).properties(
-        # width=1200,
-        height=500,
+        height=600,
     )
     yield_chart = yield_chart.properties(
-        # width=1200,
         height=250
     )
     drawdown_chart = drawdown_chart.properties(
-        # width=1200,
         height=250
     )
 
