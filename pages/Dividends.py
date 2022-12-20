@@ -70,7 +70,11 @@ def process_dividend_history(history):
     return dividends
 
 load_css()
-st.title('Dividends')
+st.title('Dividend Chart')
+st.markdown("""
+    - Subscribe to [the newsletter](https://dividendchart.substack.com/) to be the first to receive the most interesting charts!
+    - Follow me on Twitter [@DividendChart](https://twitter.com/DividendChart).
+""")
 col1, col2 = st.columns(2)
 ticker = col1.text_input("Ticker", value='MSFT')
 period = col2.selectbox("Period", options=[
