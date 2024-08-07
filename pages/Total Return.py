@@ -23,7 +23,7 @@ st.title('Total return calculator')
 col1, col2, col3 = st.columns(3)
 ticker = col1.text_input("Ticker", value='MSFT')
 period = col2.selectbox("Period", options=[
-        '1d', '5d', '1mo', '3mo', '6mo', '1y', '2y', '5y', '10y', 'ytd', 'max'
+        '5d', '1mo', '3mo', '6mo', '1y', '2y', '5y', '10y', 'ytd', 'max'
     ],
     index=6
 )
