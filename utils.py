@@ -130,36 +130,6 @@ alt.themes.register("test", streamlit_theme)
 alt.themes.enable("test")
 alt.data_transformers.disable_max_rows()
 
-def generate_tweet_ticker_details(info):
-    # Equity
-    if info['quoteType'] == "EQUITY":
-        details = [
-            f"{info['shortName']} ${info['symbol']} :",
-            f"• Sector: {info['sector']}",
-            f"• MarketCap: ${info['marketCap']/1e9:.1f}B",
-            f"• P/E trailing/fwd: {info['trailingPE']:.1f}/{info['forwardPE']:.1f}"
-        ]
-    # ETF
-    elif info['quoteType'] == "ETF":
-        details = [f"{info['shortName']} ${info['symbol']} :"]
-
-        if holdings := ['$' + holding['symbol'] for holding in info['holdings'][:5] if holding['symbol'] != '']:
-            details += [f"• Top holdings: {' '.join(holdings)}"]
-
-        if 'totalAssets' in info and info['totalAssets']:
-            details += [f"• AUM: ${info['totalAssets']/1e9:.2f}B"]
-
-        if equity_holdings := info['equityHoldings']:
-            if 'priceToEarnings' in equity_holdings and equity_holdings['priceToEarnings']:
-                details += [f"• P/E: {info['equityHoldings']['priceToEarnings']:.1f}"]
-    # Unknown
-    else:
-        details = [
-            f"Here is your chart!"
-        ]
-
-    return details
-
 def load_ticker_data(ticker: str, period: str) -> pd.DataFrame:
     """
     Returns stock history from a ticker and a period.
@@ -180,11 +150,10 @@ def load_ticker_data(ticker: str, period: str) -> pd.DataFrame:
         auto_adjust=False
     )
 
-def process_dividend_history(history):
+def process_dividend_history(history: pd.DataFrame) -> pd.DataFrame:
     # Get df with dividend distributions
     dividends = history.loc[history.Dividends > 0, 'Dividends'].to_frame()
 
-    # Keep one distribution per month
     dividends['Month'] = dividends.index.to_period('1M')
     dividends = (dividends
         .reset_index()
@@ -196,6 +165,7 @@ def process_dividend_history(history):
 
     # Count distributions per year
     yearly_distributions = dividends.groupby(dividends.index.year).Dividends.count()
+
     # First and current year do not have all distributions, use next and previous year's numbers
     yearly_distributions.iloc[0] = yearly_distributions.iloc[1]
     yearly_distributions.iloc[-1] = yearly_distributions.iloc[-2]
@@ -224,7 +194,7 @@ def process_dividend_history(history):
     )
 
     # Get at least one full year
-    dividends = dividends.loc[dividends.index > dividends.index[0] + datetime.timedelta(days=365)]
+    #dividends = dividends.loc[dividends.index > dividends.index[0] + datetime.timedelta(days=365)]
 
     # Growth in dividends since beginning of timeframe
     dividends['DivGrowth'] = dividends['YearlyDividends'] / dividends['YearlyDividends'].iloc[0] - 1
@@ -232,11 +202,11 @@ def process_dividend_history(history):
     
     return dividends
 
-def generate_dividend_chart(ticker, period):
-        # Load historical data
+def generate_dividend_chart(ticker, period, currency_symbol='$'):
+    # Load historical data
     history = load_ticker_data(
         ticker=ticker,
-        period=f"{int(period.split('y')[0]) + 1}y" if 'y' in period else period
+        period=f"{int(period.split('y')[0])}y" if 'y' in period else period
     )
 
     dividends = process_dividend_history(history)
@@ -263,8 +233,22 @@ def generate_dividend_chart(ticker, period):
     # Calculate quantiles of dividend yield
     quantiles = df.DividendYield.quantile(q=np.arange(0, 1.1, .1))
     yield_df = pd.DataFrame(df.YearlyDividends.to_numpy()[:, None] / quantiles.to_numpy(), index=df.Date)
-    yield_df.columns = [f"{(decile - 1) * 10:>02.0f}% to {decile * 10}%" for decile in yield_df.columns[::-1]]
+    yield_df.columns = [f"{decile * 10}%" for decile in yield_df.columns[::-1]]
     yield_df = yield_df.reset_index()
+
+    # Set locale options
+    if currency_symbol in ['€', 'CHF']:
+        alt.renderers.set_embed_options(
+            formatLocale={ 
+                'currency': ['', f'\u00a0{currency_symbol}']
+            }
+        )
+    else:
+        alt.renderers.set_embed_options(
+            formatLocale={
+                'currency': [f'\u00a0{currency_symbol}', '']
+            }
+        )
 
     # Create color palette and scale for legend
     palette = sns.color_palette("vlag_r", len(quantiles)-1).as_hex()
@@ -273,9 +257,9 @@ def generate_dividend_chart(ticker, period):
 
     upside_downside = df.DividendYield.iloc[-1] / df.DividendYield.quantile(q=0.5)
     if upside_downside > 1: 
-        upside_downside_str = f'{upside_downside - 1: .0%} upside to median yield (~${upside_downside * df.Close.iloc[-1]:.0f}).'
+        upside_downside_str = f'{upside_downside - 1: .0%} upside to median yield (~{currency_symbol}{upside_downside * df.Close.iloc[-1]:.0f}).'
     else:
-        upside_downside_str = f'{upside_downside - 1: .0%} downside to median yield.'
+        upside_downside_str = f'{upside_downside - 1: .0%} downside to median yield (~{currency_symbol}{upside_downside * df.Close.iloc[-1]:.0f}).'
 
     # Create layers for chart
     def make_layer(yield_df, col1, col2):
@@ -288,7 +272,7 @@ def generate_dividend_chart(ticker, period):
         ).encode(
             y=alt.Y(
                 f"{col1}:Q",
-                title=f'Stock price: {upside_downside_str}',
+                title=f'Price: {upside_downside_str}',
                 axis=alt.Axis(format='$.0f'),
                 scale=alt.Scale(zero=False, domain=[df.Close.min()*0.9, df.Close.max()*1.15], clamp=True),
             ),
@@ -299,12 +283,13 @@ def generate_dividend_chart(ticker, period):
                 f"color:N",
                 title='Yield percentile',
                 scale=scale,
-                legend=alt.Legend(
-                    # legendX=465,
-                    # legendY=-25,
-                    orient='top',
-                    direction='vertical',
-                )
+                legend=None,
+                # legend=alt.Legend(
+                #     legendX=465,
+                #     legendY=-25,
+                #     orient='none',
+                #     direction='horizontal',
+                # )
             ),
             opacity=alt.value(0.75),
             tooltip=alt.value(None)
@@ -349,9 +334,9 @@ def generate_dividend_chart(ticker, period):
             'DividendYield:Q',
             axis=alt.Axis(format='.1%',),
             scale=alt.Scale(zero=False),
-            # title=f'Dividend yield: higher than {df.DividendYield.rank(pct=True).iloc[-1]:.0%} of the period (median {df.DividendYield.quantile(q=0.5):.2%}).'
-            title=f'Dividend yield'
-        )
+            title=f'Dividend yield: higher than {df.DividendYield.rank(pct=True).iloc[-1]:.0%} of the period (median {df.DividendYield.quantile(q=0.5):.2%}).',
+        ),
+        tooltip=alt.value(None)
     )
     median_yield = price.mark_rule(
         color='white',
@@ -384,7 +369,8 @@ def generate_dividend_chart(ticker, period):
                 format='.0%',
             ),
             scale=alt.Scale(zero=False)
-        )
+        ),
+        tooltip=alt.value(None)
     )
     drawdown_text = price_text.encode(
         y=alt.Y('Drawdown:Q', scale=alt.Scale(zero=False)),
@@ -405,16 +391,22 @@ def generate_dividend_chart(ticker, period):
     percentile_string = format_percentile(percentile)
 
     price_chart = alt.layer(*layers).properties(
-        height=600,
+        width=1200,
+        height=400,
+        # title=f"""{ticker} {period} Chart • Price: ${
+        #             df.iloc[-1].Close:.2f} • Yield: {
+        #             df.iloc[-1].DividendYield:.2%} ({
+        #             percentile_string} percentile) • Drawdown: {
+        #                 df.Drawdown.iloc[-1]:.0%}""",
     )
     yield_chart = yield_chart.properties(
-        height=250
+        width=1200,
+        height=300
     )
     drawdown_chart = drawdown_chart.properties(
-        height=250
+        width=1200,
+        height=300
     )
-
-    return price_chart, (yield_chart + yield_text + median_yield), (drawdown_chart + drawdown_text)
 
     chart = alt.vconcat(
         price_chart,
@@ -423,10 +415,10 @@ def generate_dividend_chart(ticker, period):
         spacing=0
     )
     chart = chart.properties(
-        title=f"""Ticker: {ticker}  •  Period: {period}"""
+        title=f"""Ticker: {ticker}  •  Period: {df.Date.dt.year.max() - df.Date.dt.year.min() + 1}y"""
     )
     chart = chart.configure(
         font='Lato'
     )
     
-    return chart
+    return price_chart, yield_chart, drawdown_chart
