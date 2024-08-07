@@ -208,8 +208,10 @@ def generate_dividend_chart(ticker, period, currency_symbol='$'):
         ticker=ticker,
         period=f"{int(period.split('y')[0])}y" if 'y' in period else period
     )
+    print("raw dividend", history[history.Dividends > 0])
 
     dividends = process_dividend_history(history)
+    print("processed dividend", dividends)
 
     # Merge dividends with price history
     df = pd.merge(
