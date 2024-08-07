@@ -5,7 +5,6 @@ import numpy as np
 import altair as alt
 import seaborn as sns
 import datetime
-import logging
 
 def load_css():
     return st.markdown(
@@ -209,10 +208,8 @@ def generate_dividend_chart(ticker, period, currency_symbol='$'):
         ticker=ticker,
         period=f"{int(period.split('y')[0])}y" if 'y' in period else period
     )
-    logging.warning(history[history.Dividends > 0])
 
     dividends = process_dividend_history(history)
-    logging.warning(dividends)
 
     # Merge dividends with price history
     df = pd.merge(
